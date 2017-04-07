@@ -1,0 +1,250 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Final Project</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		 <script src="https://d3js.org/d3.v3.js"></script>
+		     <style>
+                body {
+                    background: #eee;
+                }
+
+                .axis path,
+                .axis line {
+                    fill: none;
+                    stroke: black;
+                    shape-rendering: auto;
+                }
+
+                .axis text {
+                    font-size: 11px;
+                    fill: black;
+                }
+            </style>
+	</head>
+
+	<body>
+            <h1>temperature</h1>
+    <svg id="temp"></svg>
+            <h1>humidity</h1>
+    <svg id="humidity"></svg>
+<!--
+    <div>
+        <button type="submit" onclick="update()">新增</button>
+        <button type="submit" onclick="remove()">移除</button>
+    </div>
+-->
+            <script>
+                // temperature
+                var arr = [20, 30, 30, 29, 27, 22];
+           
+                var w = 600;
+                var h = 200;
+                var p = 30;
+                var int;
+                svg();
+                bind(arr);
+                render();
+                autotimeout();
+                function svg() {
+                    d3.select("#temp")
+                        .attr({
+                            "width": w,
+                            "height": h,
+                        });
+                    d3.select("svg").append("g").append("rect").attr({
+                        width: "100%",
+                        height: "100%",
+                        fill: "white"
+                    });
+                }
+
+                function bind(data) {
+
+                    //狀態1
+                    var selection = d3.select("#temp")
+                        .selectAll("rect")
+                        .data(data);
+
+                    //狀態2
+                    selection.enter()
+                        .append("rect");
+
+                    //狀態3
+                    selection.exit()
+                        .remove();
+
+                    var selection_text = d3.select("#temp")
+                        .selectAll("text")
+                        .data(data);
+
+                    selection_text.enter()
+                        .append("text");
+
+                    selection_text.exit()
+                        .remove();
+
+                }
+
+                function render() {
+                    d3.select("#temp")
+                        .selectAll("rect")
+                        .attr({
+                            "x": function(d, i) {
+                                return (p + 50 * i+5);
+                            },
+                            "y": function(d) {
+                                return (h - p - d);
+                            },
+                            "width": 20,
+                            "height": function(d) {
+                                return d;
+                            },
+                            "fill": function(d) {
+                                if ((d > 30)||(d<20)) {
+                                    return "red";
+                                } else{
+                                    return "lightgreen";
+                                }
+                            }
+                        });
+
+                    d3.select("#temp")
+                        .selectAll("text")
+                        .attr({
+                            "x": function(d, i) {
+                                return (p + 50 * i + 3);
+                            },
+                            "y": function(d) {
+                                return (h - p + 25);
+                            }
+                        }).text(function(d) {
+                            return d+'\'C';
+                        });
+                }
+                function autotimeout()
+                {
+                     int =self.setInterval("update();remove();",1000)
+                }
+                
+                function update() {
+                    var num = random(10, 50);
+                    arr.push(num);
+                    bind(arr);
+                    render();
+                }
+
+                function remove() {
+                    arr.shift();
+                    bind(arr);
+                    render();
+                }
+
+                function random(N, M) {
+                    var rScale = d3.scale.linear()
+                        .domain([0, 1])
+                        .rangeRound([N, M]);
+                    return rScale(Math.random());
+                    // return Math.ceil(Math.random() * (M - N) + N);
+                }
+            </script>
+            <br>
+            <script>
+                var arr_h = [50, 40, 60, 69, 47, 32];
+                var int_h;
+                //console.log("hello");
+                bind_hum(arr_h);
+                render_hum();
+                autohumtimeout();
+                svg_h();
+                // humidity
+                function svg_h() {
+                    d3.select("#humidity")
+                        .attr({
+                            "width": w,
+                            "height": h,
+                        })
+                }
+                function bind_hum(data) {
+                      
+                    //狀態1
+                    var selection = d3.select("#humidity")
+                        .selectAll("rect")
+                        .data(data);
+
+                    //狀態2
+                    selection.enter()
+                        .append("rect");
+
+                    //狀態3
+                    selection.exit()
+                        .remove();
+
+                    var selection_text = d3.select("#humidity")
+                        .selectAll("text")
+                        .data(data);
+
+                    selection_text.enter()
+                        .append("text");
+
+                    selection_text.exit()
+                        .remove();
+
+                }
+                function render_hum() {
+                    d3.select("#humidity")
+                        .selectAll("rect")
+                        .attr({
+                            "x": function(d, i) {
+                                return (p + 50 * i+5);
+                            },
+                            "y": function(d) {
+                                return (h - p - d);
+                            },
+                            "width": 20,
+                            "height": function(d) {
+                                return d;
+                            },
+                            "fill": function(d) {
+                                if ((d > 60)||(d<40)) {
+                                    return "red";
+                                } else{
+                                    return "lightgreen";
+                                }
+                            }
+                        });
+
+                    d3.select("#humidity")
+                        .selectAll("text")
+                        .attr({
+                            "x": function(d, i) {
+                                return (p + 50 * i + 3);
+                            },
+                            "y": function(d) {
+                                return (h - p + 25);
+                            }
+                        }).text(function(d) {
+                            return d+"%";
+                        });
+                }
+                function autohumtimeout()
+                {
+                     int_h =self.setInterval("update_hum();remove_hum();",1000)
+                }
+                function update_hum() {
+                    var num_h = random(20, 80);
+                    arr_h.push(num_h);
+                    bind_hum(arr_h);
+                    render_hum();
+                }
+                function remove_hum() {
+                    arr_h.shift();
+                    bind_hum(arr_h);
+                    render_hum();
+                }
+            </script>
+
+	</body>
+</html>

@@ -1,0 +1,409 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Final Project</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+		 <script src="https://d3js.org/d3.v3.js"></script>
+		     <style>
+                body {
+                    background: #eee;
+                }
+
+                .axis path,
+                .axis line {
+                    fill: none;
+                    stroke: black;
+                    shape-rendering: auto;
+                }
+                .temp text {
+                    font-size: 11px;
+                    fill: black;
+                 }
+                .axis text {
+                    font-size: 11px;
+                    fill: black;
+                }
+            </style>
+	</head>
+
+	<body>
+            <h1>temperature</h1>
+    <svg id="temp"></svg>
+            <h1>humidity</h1>
+    <svg id="humidity"></svg>
+
+            <script>
+                // temperature
+                //var arr = [20, 30, 30, 29, 27, 22,30,30,30,30];
+                var arr;
+                var w = 800;
+                var h = 500;
+                var p = 100;
+                var int;
+                svg_temp();
+                d3.json("temp_hum.json",  function(dataSet){
+                    bind_temp(dataSet);
+                    render_temp(dataSet);
+                    arr=dataSet;
+                });
+                autotimeout_temp();
+                function svg_temp() {
+                    d3.select("#temp")
+                        .attr({
+                            "width": w,
+                            "height": h,
+                        });
+                    d3.select("#temp").append("g").append("rect").attr({
+                        width: "100%",
+                        height: "100%",
+                        fill: "white"
+                    });
+               
+                    d3.select("#temp")
+                        .append("g")
+                        .classed("axisX",true)
+                        .attr("id","axisX");
+
+                    d3.select("#temp")
+                        .append("g")
+                        .classed("axisY",true)
+                        .attr("id","axisY");
+                    
+                }
+
+                function bind_temp(data) {
+
+                    //狀態1
+                    var selection = d3.select("#temp")
+                        .selectAll("rect")
+                        .data(data);
+
+                    //狀態2
+                    selection.enter()
+                        .append("rect");
+
+                    //狀態3
+                    selection.exit()
+                        .remove();
+                    
+                    
+                    var selection_temp_text = d3.select("#temp")
+                        .selectAll("text").filter(".temp")
+                        .data(data);
+
+                    
+                    selection_temp_text.enter()
+                        .append("text")
+                        .classed("temp",true)
+                        .text(function(d){
+                            return d.temp;
+                        });
+
+                    selection_temp_text.exit()
+                        .remove();
+        
+                }
+
+                function render_temp(dataSet) {
+                             var xScale = d3.scale.ordinal() 
+                                 .domain(dataSet.map(function(d){return(d.timer);}).reverse())
+                                 .range([p+460,p+410,p+360,p+310,p+260,p+210,p+160,p+110,p+60,p+10]);
+                                 //.range([p, w-p])
+                             
+                            var yScale = d3.scale.linear()
+                                  .domain([d3.min(dataSet,function(d){
+                                                return d.temp;
+                                        }),d3.max(dataSet,function(d){
+                                                return d.temp;
+                                        })])
+                                 .range([h-p,p]);
+//                             var yScale = d3.scale.linear()
+//                                          .domain([0,50])
+//                                         .range([h-p,p]);
+
+                            var xAxis = d3.svg.axis()
+                                 .scale(xScale)
+                                 .orient("bottom")
+                                 .ticks(10);
+
+                            var yAxis = d3.svg.axis()
+                                 .scale(yScale)
+                                 .orient("left")
+                                 .ticks(5);
+
+                            d3.select("#temp")
+                                .selectAll("rect")
+                                .attr({
+                                    "x": function(d, i) {
+                                        return (p + 50 * i+5);
+                                    },
+                                    "y": function(d) {
+                                        return yScale(d.temp);
+                                    },
+                                    "width": 20,
+                                    "height": function(d) {
+                                        return h-p-yScale(d.temp);
+                                    },
+                                    "fill": function(d) {
+                                        if ((d.temp > 30)||(d.temp<20)) {
+                                            return "red";
+                                        } else{
+                                            return "lightgreen";
+                                        }
+                                    }
+                                });
+
+                         
+                    
+                            d3.select("#temp")
+                                .selectAll("text").filter(".temp")
+                                .attr({
+                                    "x": function(d, i) {
+                                        return (p + 50 * i + 3);
+                                    },
+                                    "y": function(d) {
+                                        return (yScale(d.temp)-5);
+                                    }
+                                }).text(function(d) {
+                                    return d.temp +'\'C';
+                                });
+                   
+                            d3.select("#temp>#axisX")
+                                //.append("g")
+                                //.classed("xaxis",true)
+                                .attr("transform","translate(0,"+(h-p)+")").call(xAxis);
+                    
+                            d3.select("#temp>#axisY")
+                                        //.append("g")
+                                        //.classed("yaxis",true)
+                                        .attr("transform","translate("+(100)+",0)").call(yAxis);
+                    
+                    
+                }
+                
+                function autotimeout_temp()
+                {
+                     int =self.setInterval("update();remove();update_hum();remove_hum();",1000);
+                }
+                
+                function update() {
+                    var temp_num = random(10, 50);
+                    var hum_num = random(20, 80);
+                    var currentdate = new Date();
+                    var timer = currentdate.getMinutes() + ":" + currentdate.getSeconds();
+                    arr.push({"temp":temp_num,"hum":hum_num,"timer":timer});
+                    bind_temp(arr);
+                    render_temp(arr);
+                }
+
+                function remove() {
+                    arr.shift();
+                    bind_temp(arr);
+                    render_temp(arr);
+                }
+
+                function random(N, M) {
+                    var rScale = d3.scale.linear()
+                        .domain([0, 1])
+                        .rangeRound([N, M]);
+                    return rScale(Math.random());
+                    // return Math.ceil(Math.random() * (M - N) + N);
+                }
+            </script>
+            <br>
+            <script>
+                // humidity
+                //var arr = [20, 30, 30, 29, 27, 22,30,30,30];
+                var arr_hum;
+                //var int;
+                svg_hum();
+                d3.json("temp_hum.json",  function(dataSet){
+                    bind_hum(dataSet);
+                    render_hum(dataSet);
+                    arr_hum=dataSet;
+                });
+                autotimeout_hum();
+                function svg_hum() {
+                    d3.select("#humidity")
+                        .attr({
+                            "width": w,
+                            "height": h,
+                        });
+                    d3.select("#humidity").append("g").append("rect").attr({
+                        width: "100%",
+                        height: "100%",
+                        fill: "white"
+                    });
+               
+                    d3.select("#humidity")
+                        .append("g")
+                        .classed("axisX_hum",true)
+                        .attr("id","axisX_hum");
+
+                    d3.select("#humidity")
+                        .append("g")
+                        .classed("axisY_hum",true)
+                        .attr("id","axisY_hum");
+                    
+                }
+
+                function bind_hum(data) {
+
+                    //狀態1
+                    var selection = d3.select("#humidity")
+                        .selectAll("rect")
+                        .data(data);
+
+                    //狀態2
+                    selection.enter()
+                        .append("rect");
+
+                    //狀態3
+                    selection.exit()
+                        .remove();
+//                    
+//                    var selection_text = d3.select("#humidity")
+//                        .selectAll("text").filter(".axis")
+//                        .data(data);
+//
+//                    
+//                    selection_text.enter()
+//                        .append("text")
+//                        .classed("axis",true)
+//                        .text(function(d){
+//                            return d.timer;
+//                        });
+//
+//                    selection_text.exit()
+//                        .remove();
+                    
+                    var selection_hum_text = d3.select("#humidity")
+                        .selectAll("text").filter(".hum")
+                        .data(data);
+
+                    
+                    selection_hum_text.enter()
+                        .append("text")
+                        .classed("hum",true)
+                        .text(function(d){
+                            return d.hum;
+                        });
+
+                    selection_hum_text.exit()
+                        .remove();
+        
+                }
+
+                function render_hum(dataSet) {
+                    var xScale_hum = d3.scale.ordinal() 
+                         .domain(dataSet.map(function(d){return(d.timer);}).reverse())
+                         .range([p+460,p+410,p+360,p+310,p+260,p+210,p+160,p+110,p+60,p+10]);                            
+                    var yScale_hum = d3.scale.linear()
+                          .domain([d3.min(dataSet,function(d){
+                                        return d.hum;
+                                }),d3.max(dataSet,function(d){
+                                        return d.hum;
+                                })])
+                         .range([h-p,p]);
+
+
+                    var xAxis_hum = d3.svg.axis()
+                         .scale(xScale_hum)
+                         .orient("bottom")
+                         .ticks(10);
+
+                    var yAxis_hum = d3.svg.axis()
+                         .scale(yScale_hum)
+                         .orient("left")
+                         .ticks(5);
+
+                    
+                    
+                    d3.select("#humidity")
+                        .selectAll("rect")
+                        .attr({
+                            "x": function(d, i) {
+                                return (p + 50 * i+5);
+                            },
+                            "y": function(d) {
+                                return  yScale_hum(d.hum);
+                            },
+                            "width": 20,
+                            "height": function(d) {
+                                return h-p-yScale_hum(d.hum);
+                            },
+                            "fill": function(d) {
+                                if ((d.hum > 70)||(d.hum<30)) {
+                                    return "red";
+                                } else{
+                                    return "lightgreen";
+                                }
+                            }
+                        });
+
+                    
+                    d3.select("#humidity")
+                        .selectAll("text").filter(".hum")
+                        .attr({
+                            "x": function(d, i) {
+                                return (p + 50 * i + 3);
+                            },
+                            "y": function(d) {
+                                return (yScale_hum(d.hum)-5);
+                            }
+                        }).text(function(d) {
+                            return d.hum +'%';
+                        });
+                   
+//                    d3.select("#humidity")
+//                        .selectAll("text").filter(".axis")
+//                        .attr({
+//                            x: function(d, i) {
+//                                return (p + 50 * i - 8);
+//                            }
+//                            ,
+//                            y: (h - p+25)})
+//                           .text(function(d) {
+//                            return d.timer;
+//                        });
+                      
+                            d3.select("#humidity>#axisX_hum")
+                                //.append("g")
+                                //.classed("xaxis",true)
+                                .attr("transform","translate(0,"+(h-p)+")").call(xAxis_hum);
+                    
+                            d3.select("#humidity>#axisY_hum")
+                                        //.append("g")
+                                        //.classed("yaxis",true)
+                                        .attr("transform","translate("+(100)+",0)").call(yAxis_hum);
+                    
+                }
+                function autotimeout_hum()
+                {
+                    // int =self.setInterval("update_hum();remove_hum();",5000)
+                }
+                
+                function update_hum() {
+                    var temp_num = random(10, 50);
+                    var hum_num = random(10, 90);
+                    var currentdate = new Date();
+                    var timer = currentdate.getMinutes() + ":" + currentdate.getSeconds();
+                    arr_hum.push({"temp":temp_num,"hum":hum_num,"timer":timer});
+                    bind_hum(arr_hum);
+                    render_hum(arr_hum);
+                }
+
+                function remove_hum() {
+                    arr_hum.shift();
+                    bind_hum(arr_hum);
+                    render_hum(arr_hum);
+                }
+
+       
+            </script>
+            
+
+	</body>
+</html>
