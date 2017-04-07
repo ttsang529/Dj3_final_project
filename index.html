@@ -30,24 +30,76 @@
 
 	<body>
             <h1>temperature</h1>
-    <svg id="temp"></svg>
+                <svg id="temp"></svg>
             <h1>humidity</h1>
-    <svg id="humidity"></svg>
+                <svg id="humidity"></svg>
 
             <script>
                 // temperature
                 //var arr = [20, 30, 30, 29, 27, 22,30,30,30,30];
-                var arr;
+                var arr =
+                    [
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          }
+                        ];
                 var w = 800;
                 var h = 500;
                 var p = 100;
                 var int;
                 svg_temp();
-                d3.json("temp_hum.json",  function(dataSet){
-                    bind_temp(dataSet);
-                    render_temp(dataSet);
-                    arr=dataSet;
-                });
+                
+                    bind_temp(arr);
+                    render_temp(arr);
+ 
+                
                 autotimeout_temp();
                 function svg_temp() {
                     d3.select("#temp")
@@ -216,14 +268,66 @@
             <script>
                 // humidity
                 //var arr = [20, 30, 30, 29, 27, 22,30,30,30];
-                var arr_hum;
+                var arr_hum=
+                                        [
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          },
+                          {
+                            "temp":0,
+                            "hum":0, 
+                            "timer":"0:00"
+                          }
+                        ];
                 //var int;
                 svg_hum();
-                d3.json("temp_hum.json",  function(dataSet){
-                    bind_hum(dataSet);
-                    render_hum(dataSet);
-                    arr_hum=dataSet;
-                });
+                
+                bind_hum(arr_hum);
+                render_hum(arr_hum);
+
+                
                 autotimeout_hum();
                 function svg_hum() {
                     d3.select("#humidity")
